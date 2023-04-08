@@ -446,7 +446,7 @@ public class AugmentedImageActivity extends AppCompatActivity implements GLSurfa
     }
 
     BoardDto boardInfo = new BoardDto(116.84f, 50.8f);
-    BoardPartDto boardPartDto = new BoardPartDto(20.0f, 41.0f, "FAKEMPN", "FAKE_PACKAGE");
+    BoardPartDto boardPartDto = new BoardPartDto(76.2f, 29.21f, "FAKEMPN", "FAKE_PACKAGE");
     // Draw all images in augmentedImageMap
     for (Pair<AugmentedImage, Anchor> pair : augmentedImageMap.values()) {
       AugmentedImage augmentedImage = pair.first;
