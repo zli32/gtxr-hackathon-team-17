@@ -496,7 +496,7 @@ public class AugmentedImageActivity extends AppCompatActivity implements GLSurfa
 
             //search using voice results to select a specific biy
             boardPartInfo = boardPartMap.get(voiceResult);
-            chipInformation.setText("Device Package: " + boardPartInfo.getDevice_package() + "MPN: " + boardPartInfo.getMpn());
+            chipInformation.setText("Device Package: " + boardPartInfo.getDevice_package() + "\nMPN: " + boardPartInfo.getMpn());
             newChip = false; //reset flag
           }
           if (boardInfo != null && boardPartInfo != null) {
