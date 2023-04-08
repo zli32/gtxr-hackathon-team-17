@@ -34,12 +34,10 @@ import android.util.Log;
 import android.util.Pair;
 import android.view.MotionEvent;
 import android.view.View;
-import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
@@ -62,12 +60,17 @@ import com.google.ar.core.examples.java.common.helpers.SnackbarHelper;
 import com.google.ar.core.examples.java.common.helpers.TrackingStateHelper;
 import com.google.ar.core.examples.java.common.rendering.BackgroundRenderer;
 import com.google.ar.core.examples.java.xmlparser.BoardDto;
+import com.google.ar.core.examples.java.xmlparser.BoardParser;
 import com.google.ar.core.examples.java.xmlparser.BoardPartDto;
 import com.google.ar.core.exceptions.CameraNotAvailableException;
 import com.google.ar.core.exceptions.UnavailableApkTooOldException;
 import com.google.ar.core.exceptions.UnavailableArcoreNotInstalledException;
 import com.google.ar.core.exceptions.UnavailableSdkTooOldException;
 import com.google.ar.core.exceptions.UnavailableUserDeclinedInstallationException;
+
+import org.xml.sax.SAXException;
+
+import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.ArrayList;
@@ -81,6 +84,7 @@ import java.util.regex.Pattern;
 
 import javax.microedition.khronos.egl.EGLConfig;
 import javax.microedition.khronos.opengles.GL10;
+import javax.xml.parsers.ParserConfigurationException;
 
 /**
  * This app extends the HelloAR Java app to include image tracking functionality.
@@ -101,6 +105,20 @@ public class AugmentedImageActivity extends AppCompatActivity implements GLSurfa
   private RequestManager glideRequestManager;
 
   private boolean installRequested;
+
+  private String voiceResult;
+
+  private boolean newChip;
+
+  //hardcode
+  File boardFile = new File("/Users/ansontsang/Documents/gtxr-hackathon-team-17/augmented_image_java/app/src/main/java/com/google/ar/core/examples/java/xmlparser/test/sab1.xml");
+
+  //arbitrary instantiation
+  private BoardDto boardInfo = null;
+
+  private Map<String, BoardPartDto> boardPartMap = null;
+
+  private BoardPartDto boardPartInfo = null;
 
   private Session session;
   private final SnackbarHelper messageSnackbarHelper = new SnackbarHelper();
@@ -404,11 +422,10 @@ public class AugmentedImageActivity extends AppCompatActivity implements GLSurfa
   }
 
   private void drawAugmentedImages(
-      Frame frame, float[] projmtx, float[] viewmtx, float[] colorCorrectionRgba) {
+      Frame frame, float[] projmtx, float[] viewmtx, float[] colorCorrectionRgba) throws ParserConfigurationException, IOException, SAXException {
     Collection<AugmentedImage> updatedAugmentedImages =
         frame.getUpdatedTrackables(AugmentedImage.class);
-
-    // Iterate to update augmentedImageMap, remove elements we cannot draw.
+    // Iterate to update augmentedImageMap, remove elements swe cannot draw.
     for (AugmentedImage augmentedImage : updatedAugmentedImages) {
       switch (augmentedImage.getTrackingState()) {
         case PAUSED:
@@ -445,16 +462,31 @@ public class AugmentedImageActivity extends AppCompatActivity implements GLSurfa
       }
     }
 
-    BoardDto boardInfo = new BoardDto(116.84f, 50.8f);
-    BoardPartDto boardPartDto = new BoardPartDto(20.0f, 41.0f, "FAKEMPN", "FAKE_PACKAGE");
+
     // Draw all images in augmentedImageMap
     for (Pair<AugmentedImage, Anchor> pair : augmentedImageMap.values()) {
       AugmentedImage augmentedImage = pair.first;
       Anchor centerAnchor = augmentedImageMap.get(augmentedImage.getIndex()).second;
       switch (augmentedImage.getTrackingState()) {
         case TRACKING:
-          augmentedImageRenderer.draw(
-              viewmtx, projmtx, augmentedImage, centerAnchor, colorCorrectionRgba, boardInfo, boardPartDto);
+          if (newChip){
+            BoardParser parser = new BoardParser(boardFile);
+
+            if (parser.parseBoard() != true) { //makes sure that the parsing worked
+              break;
+            }
+            boardInfo = parser.getBoardInfo() ;
+            boardPartMap = parser.getBoardPartsInfo(); //list of all board parts
+
+            //search using voice results to select a specific biy
+            boardPartInfo = boardPartMap.get(voiceResult);
+
+            newChip = false; //reset flag
+          }
+          if (boardInfo != null && boardPartInfo != null) {
+            augmentedImageRenderer.draw(
+                    viewmtx, projmtx, augmentedImage, centerAnchor, colorCorrectionRgba, boardInfo, boardPartInfo);
+          }
           break;
         default:
           break;
@@ -571,6 +603,8 @@ public class AugmentedImageActivity extends AppCompatActivity implements GLSurfa
           }
           if (match != null) {
             // match is j1, t15
+            voiceResult = match.toUpperCase();
+            newChip = true;
             debugOverlay.setText(match);
             System.out.println(match);
           } else {
