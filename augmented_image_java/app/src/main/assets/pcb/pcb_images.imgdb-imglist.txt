@@ -1,1 +1,2 @@
+default.jpg|.\app\src\main\assets\pcb/default.jpg
 sab1.png|.\app\src\main\assets\pcb/sab1.png
