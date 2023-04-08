@@ -390,7 +390,7 @@ public class AugmentedImageActivity extends AppCompatActivity implements GLSurfa
       // This will improve the initial detection speed. ARCore will still actively estimate the
       // physical size of the image as it is viewed from multiple viewpoints.
     } else {
-      // This is an alternative way to initialize an AugmentedImageDatabase instance,
+      // This is an alternative way to initialize an AugmenteadImageDatabase instance,
       // load a pre-existing augmented image database.
       try (InputStream is = getAssets().open("pcb/pcb_images.imgdb")) {
         augmentedImageDatabase = AugmentedImageDatabase.deserialize(session, is);
