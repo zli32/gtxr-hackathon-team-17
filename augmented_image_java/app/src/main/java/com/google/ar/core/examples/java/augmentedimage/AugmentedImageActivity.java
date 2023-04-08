@@ -16,18 +16,34 @@
 
 package com.google.ar.core.examples.java.augmentedimage;
 
+import android.Manifest;
+import android.annotation.SuppressLint;
+import android.content.Intent;
+import android.content.pm.PackageManager;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.net.Uri;
 import android.opengl.GLES20;
 import android.opengl.GLSurfaceView;
+import android.os.Build;
 import android.os.Bundle;
+import android.speech.RecognitionListener;
+import android.speech.RecognizerIntent;
+import android.speech.SpeechRecognizer;
 import android.util.Log;
 import android.util.Pair;
+import android.view.MotionEvent;
 import android.view.View;
+import android.widget.EditText;
 import android.widget.ImageView;
+import android.widget.TextView;
 import android.widget.Toast;
+
+import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.core.app.ActivityCompat;
+import androidx.core.content.ContextCompat;
+
 import com.bumptech.glide.Glide;
 import com.bumptech.glide.RequestManager;
 import com.google.ar.core.Anchor;
@@ -52,9 +68,14 @@ import com.google.ar.core.exceptions.UnavailableSdkTooOldException;
 import com.google.ar.core.exceptions.UnavailableUserDeclinedInstallationException;
 import java.io.IOException;
 import java.io.InputStream;
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
+import java.util.Locale;
 import java.util.Map;
+import java.util.Objects;
+import java.util.regex.Pattern;
+
 import javax.microedition.khronos.egl.EGLConfig;
 import javax.microedition.khronos.opengles.GL10;
 
@@ -96,10 +117,47 @@ public class AugmentedImageActivity extends AppCompatActivity implements GLSurfa
   // database.
   private final Map<Integer, Pair<AugmentedImage, Anchor>> augmentedImageMap = new HashMap<>();
 
+  // debug overlay, disable for real build
+  private TextView debugOverlay;
+
+  // bottom right mic button
+  private ImageView micButton;
+
+  public static final Integer RecordAudioRequestCode = 1;
+  private SpeechRecognizer speechRecognizer;
+  private boolean isListening = false;
+  static HashMap<String, Integer> numbers= new HashMap<String, Integer>();
+
+  static {
+    numbers.put("zero", 0);
+    numbers.put("one", 1);
+    numbers.put("two", 2);
+    numbers.put("three", 3);
+    numbers.put("four", 4);
+    numbers.put("five", 5);
+    numbers.put("six", 6);
+    numbers.put("seven", 7);
+    numbers.put("eight", 8);
+    numbers.put("nine", 9);
+    numbers.put("ten", 10);
+    numbers.put("eleven", 11);
+    numbers.put("twelve", 12);
+    numbers.put("thirteen", 13);
+    numbers.put("fourteen", 14);
+    numbers.put("fifteen", 15);
+    numbers.put("sixteen", 16);
+    numbers.put("seventeen", 17);
+    numbers.put("eighteen", 18);
+    numbers.put("nineteen", 19);
+  }
+
   @Override
   protected void onCreate(Bundle savedInstanceState) {
     super.onCreate(savedInstanceState);
     setContentView(R.layout.activity_main);
+    if(ContextCompat.checkSelfPermission(this,Manifest.permission.RECORD_AUDIO) != PackageManager.PERMISSION_GRANTED){
+      checkPermission();
+    }
     surfaceView = findViewById(R.id.surfaceview);
     displayRotationHelper = new DisplayRotationHelper(/*context=*/ this);
 
@@ -118,6 +176,30 @@ public class AugmentedImageActivity extends AppCompatActivity implements GLSurfa
         .into(fitToScanView);
 
     installRequested = false;
+    // setup speech to text
+    setupSpeech();
+
+  }
+
+  @SuppressLint("ClickableViewAccessibility")
+  private void setupSpeech() {
+    debugOverlay = findViewById(R.id.debug_overlay);
+    micButton = findViewById(R.id.mic_button);
+    setupSpeechRecognizer();
+    micButton.setOnTouchListener((view, motionEvent) -> {
+      if (motionEvent.getAction() == MotionEvent.ACTION_DOWN){
+        if (!isListening) {
+          micButton.setImageResource(R.drawable.mic_red);
+          startSpeechRecognition();
+        } else {
+          micButton.setImageResource(R.drawable.mic);
+          stopSpeechRecognition();
+        }
+
+      }
+      return false;
+    });
+
   }
 
   @Override
@@ -132,6 +214,8 @@ public class AugmentedImageActivity extends AppCompatActivity implements GLSurfa
     }
 
     super.onDestroy();
+    // Release resources
+    speechRecognizer.destroy();
   }
 
   @Override
@@ -226,6 +310,11 @@ public class AugmentedImageActivity extends AppCompatActivity implements GLSurfa
         CameraPermissionHelper.launchPermissionSettings(this);
       }
       finish();
+    }
+
+    if (requestCode == RecordAudioRequestCode && results.length > 0 ){
+      if(results[0] == PackageManager.PERMISSION_GRANTED)
+        Toast.makeText(this,"Permission Granted",Toast.LENGTH_SHORT).show();
     }
   }
 
@@ -412,5 +501,142 @@ public class AugmentedImageActivity extends AppCompatActivity implements GLSurfa
       Log.e(TAG, "IO exception loading augmented image bitmap.", e);
     }
     return null;
+  }
+
+  @SuppressLint("ObsoleteSdkInt")
+  private void checkPermission() {
+    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+      ActivityCompat.requestPermissions(this,new String[]{Manifest.permission.RECORD_AUDIO},RecordAudioRequestCode);
+    }
+  }
+
+  private void setupSpeechRecognizer() {
+    // Create a new SpeechRecognizer
+    speechRecognizer = SpeechRecognizer.createSpeechRecognizer(this);
+
+    // Set the listener for recognition events
+    speechRecognizer.setRecognitionListener(new RecognitionListener() {
+      @Override
+      public void onReadyForSpeech(Bundle bundle) {
+      }
+
+      @Override
+      public void onBeginningOfSpeech() {
+        debugOverlay.setText("");
+        debugOverlay.setHint("Listening...");
+        System.out.println("Listening...");
+      }
+
+      @Override
+      public void onRmsChanged(float v) {
+
+      }
+
+      @Override
+      public void onBufferReceived(byte[] bytes) {
+
+      }
+
+      @Override
+      public void onEndOfSpeech() {
+
+      }
+
+      @Override
+      public void onError(int i) {
+        // An error has occurred during recognition
+        // Restart the recognition process
+        if (isListening) {
+          System.out.println("ERROR: " + i);
+          speechRecognizer.startListening(createSpeechRecognizerIntent());
+        }
+
+      }
+
+      @Override
+      public void onResults(Bundle results) {
+        ArrayList<String> matches = results.getStringArrayList(SpeechRecognizer.RESULTS_RECOGNITION);
+        if (matches != null) {
+          String match = matches.get(0);
+          match = matchToString(match);
+          if (match != null) {
+            // match is j1, t15
+            debugOverlay.setText(match);
+            System.out.println(match);
+          } else {
+            debugOverlay.setText("No match");
+            System.out.println("No match");
+          }
+        } else {
+          System.out.println("Matches are empty");
+        }
+
+        // Restart the recognition process
+        if (isListening) {
+          speechRecognizer.startListening(createSpeechRecognizerIntent());
+        }
+
+      }
+
+      @Override
+      public void onPartialResults(Bundle bundle) {
+
+      }
+
+      @Override
+      public void onEvent(int i, Bundle bundle) {
+
+      }
+    });
+  }
+
+  private String matchToString(String match) {
+    //        return the match as J3, R7 or null if theres no match
+    System.out.println("Original match: " + match);
+    String s = match.toLowerCase();
+
+    //        make sure matches full string
+    if (Pattern.matches("[a-z][0-9]+", s)) {
+      return s;
+    }
+    //        assume its "[a-z] <number as english word>"
+    if (s.matches("^.+[-\\s].+$")) {
+      String[] matches = s.split("[-\\s]");
+      if (matches.length >= 2) {
+        String letter = matches[0].substring(0, 1);
+        String number = matches[1];
+        if (numbers.containsKey(number)) {
+          return letter + (Objects.requireNonNull(numbers.get(number))).toString();
+        }
+        return null;
+      }
+      return null;
+    }
+    return null;
+  }
+
+  private Intent createSpeechRecognizerIntent() {
+    // Create a new Intent to start the speech recognition activity
+    Intent intent = new Intent(RecognizerIntent.ACTION_RECOGNIZE_SPEECH);
+
+    // Specify the language model and offline mode
+    intent.putExtra(RecognizerIntent.EXTRA_LANGUAGE_MODEL,RecognizerIntent.LANGUAGE_MODEL_FREE_FORM);
+    intent.putExtra(RecognizerIntent.EXTRA_LANGUAGE, Locale.getDefault());
+//    intent.putExtra(RecognizerIntent.EXTRA_PREFER_OFFLINE, true);
+    return intent;
+  }
+
+  private void startSpeechRecognition() {
+    // Start the recognition process
+    speechRecognizer.startListening(createSpeechRecognizerIntent());
+    isListening = true;
+  }
+
+  private void stopSpeechRecognition() {
+    // Stop the recognition process
+    speechRecognizer.stopListening();
+    isListening = false;
+    debugOverlay.setHint("Stopped Listening");
+    System.out.println("Stopped.");
   }
 }
