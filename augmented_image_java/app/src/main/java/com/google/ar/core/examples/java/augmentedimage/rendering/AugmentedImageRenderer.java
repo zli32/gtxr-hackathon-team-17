@@ -38,6 +38,8 @@ public class AugmentedImageRenderer {
   };
 
   private final ObjectRenderer object = new ObjectRenderer();
+  private final ObjectRenderer chipHighlight = new ObjectRenderer();
+
 //  private final ObjectRenderer imageFrameUpperRight = new ObjectRenderer();
 //  private final ObjectRenderer imageFrameLowerLeft = new ObjectRenderer();
 //  private final ObjectRenderer imageFrameLowerRight = new ObjectRenderer();
@@ -46,10 +48,16 @@ public class AugmentedImageRenderer {
 
   public void createOnGlThread(Context context) throws IOException {
 
-    object.createOnGlThread(
-        context, "models/andy.obj", "models/andy.png");
-    object.setMaterialProperties(0.0f, 3.5f, 1.0f, 6.0f);
-    object.setBlendMode(BlendMode.AlphaBlending);
+//    object.createOnGlThread(
+//        context, "models/andy.obj", "models/andy.png");
+//    object.setMaterialProperties(0.0f, 3.5f, 1.0f, 6.0f);
+//    object.setBlendMode(BlendMode.AlphaBlending);
+
+
+    chipHighlight.createOnGlThread(
+            context, "models/chipHighlight2.obj", "models/highlightColor.png");
+    chipHighlight.setMaterialProperties(0.0f, 3.5f, 1.0f, 6.0f);
+    chipHighlight.setBlendMode(BlendMode.AlphaBlending);
 
 //    imageFrameUpperRight.createOnGlThread(
 //        context, "models/frame_upper_right.obj", "models/frame_base.png");
