@@ -420,6 +420,13 @@ public class AugmentedImageActivity extends AppCompatActivity implements GLSurfa
       messageSnackbarHelper.showError(this, "Could not setup augmented image database");
     }
     session.configure(config);
+    try {
+      session.resume();
+      session.pause();
+      session.resume();
+    } catch(Exception e) {
+
+    }
   }
 
   private void drawAugmentedImages(
