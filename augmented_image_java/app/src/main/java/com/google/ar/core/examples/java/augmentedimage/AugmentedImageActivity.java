@@ -144,12 +144,8 @@ public class AugmentedImageActivity extends AppCompatActivity implements GLSurfa
 
   private TextView chipInformation;
 
-  // bottom right mic button
-  private ImageView micButton;
-
   public static final Integer RecordAudioRequestCode = 1;
   private SpeechRecognizer speechRecognizer;
-  private boolean isListening = false;
   static HashMap<String, Integer> numbers= new HashMap<String, Integer>();
 
   static {
@@ -209,22 +205,8 @@ public class AugmentedImageActivity extends AppCompatActivity implements GLSurfa
   private void setupSpeech() {
     debugOverlay = findViewById(R.id.debug_overlay);
     chipInformation = findViewById(R.id.Chip_Information);
-    micButton = findViewById(R.id.mic_button);
     setupSpeechRecognizer();
-    micButton.setOnTouchListener((view, motionEvent) -> {
-      if (motionEvent.getAction() == MotionEvent.ACTION_DOWN){
-        if (!isListening) {
-          micButton.setImageResource(R.drawable.mic_red);
-          startSpeechRecognition();
-        } else {
-          micButton.setImageResource(R.drawable.mic);
-          stopSpeechRecognition();
-        }
-
-      }
-      return false;
-    });
-
+    startSpeechRecognition();
   }
 
   @Override
@@ -599,11 +581,7 @@ public class AugmentedImageActivity extends AppCompatActivity implements GLSurfa
       public void onError(int i) {
         // An error has occurred during recognition
         // Restart the recognition process
-        if (isListening) {
-          System.out.println("ERROR: " + i);
           speechRecognizer.startListening(createSpeechRecognizerIntent());
-        }
-
       }
 
       @Override
@@ -632,9 +610,8 @@ public class AugmentedImageActivity extends AppCompatActivity implements GLSurfa
         }
 
         // Restart the recognition process
-        if (isListening) {
-          speechRecognizer.startListening(createSpeechRecognizerIntent());
-        }
+        speechRecognizer.startListening(createSpeechRecognizerIntent());
+
 
       }
 
@@ -693,20 +670,17 @@ public class AugmentedImageActivity extends AppCompatActivity implements GLSurfa
     // Specify the language model and offline mode
     intent.putExtra(RecognizerIntent.EXTRA_LANGUAGE_MODEL,RecognizerIntent.LANGUAGE_MODEL_FREE_FORM);
     intent.putExtra(RecognizerIntent.EXTRA_LANGUAGE, Locale.getDefault());
-//    intent.putExtra(RecognizerIntent.EXTRA_PREFER_OFFLINE, true);
     return intent;
   }
 
   private void startSpeechRecognition() {
     // Start the recognition process
     speechRecognizer.startListening(createSpeechRecognizerIntent());
-    isListening = true;
   }
 
   private void stopSpeechRecognition() {
     // Stop the recognition process
     speechRecognizer.stopListening();
-    isListening = false;
     debugOverlay.setHint("Stopped Listening");
     System.out.println("Stopped.");
   }
