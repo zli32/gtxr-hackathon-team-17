@@ -61,6 +61,8 @@ import com.google.ar.core.examples.java.common.helpers.FullScreenHelper;
 import com.google.ar.core.examples.java.common.helpers.SnackbarHelper;
 import com.google.ar.core.examples.java.common.helpers.TrackingStateHelper;
 import com.google.ar.core.examples.java.common.rendering.BackgroundRenderer;
+import com.google.ar.core.examples.java.xmlparser.BoardDto;
+import com.google.ar.core.examples.java.xmlparser.BoardPartDto;
 import com.google.ar.core.exceptions.CameraNotAvailableException;
 import com.google.ar.core.exceptions.UnavailableApkTooOldException;
 import com.google.ar.core.exceptions.UnavailableArcoreNotInstalledException;
@@ -442,6 +444,8 @@ public class AugmentedImageActivity extends AppCompatActivity implements GLSurfa
       }
     }
 
+    BoardDto boardInfo = new BoardDto(116.84f, 50.8f);
+    BoardPartDto boardPartDto = new BoardPartDto(20.0f, 41.0f, "FAKEMPN", "FAKE_PACKAGE");
     // Draw all images in augmentedImageMap
     for (Pair<AugmentedImage, Anchor> pair : augmentedImageMap.values()) {
       AugmentedImage augmentedImage = pair.first;
@@ -449,7 +453,7 @@ public class AugmentedImageActivity extends AppCompatActivity implements GLSurfa
       switch (augmentedImage.getTrackingState()) {
         case TRACKING:
           augmentedImageRenderer.draw(
-              viewmtx, projmtx, augmentedImage, centerAnchor, colorCorrectionRgba);
+              viewmtx, projmtx, augmentedImage, centerAnchor, colorCorrectionRgba, boardInfo, boardPartDto);
           break;
         default:
           break;

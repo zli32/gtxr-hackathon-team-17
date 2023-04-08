@@ -5,9 +5,7 @@ import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.ParserConfigurationException;
 
 import org.w3c.dom.Document;
-import org.w3c.dom.NamedNodeMap;
 import org.w3c.dom.NodeList;
-import org.w3c.dom.Node;
 import org.w3c.dom.Element;
 import org.xml.sax.EntityResolver;
 import org.xml.sax.InputSource;
@@ -24,18 +22,22 @@ public class BoardParser {
     private DocumentBuilder builder;
     private Document doc;
 
+    private BoardDto boardInfo;
+
+    private Map<String, BoardPartDto>  boardPartsInfo;
+
     public BoardParser(File boardFile) {
         this.board = boardFile;
     }
 
-    public Map<String, BoardDto> parseBoard() throws ParserConfigurationException, IOException, SAXException {
-        Map<String, BoardDto> boardInfo = new HashMap<>();
-
+    public boolean parseBoard() throws ParserConfigurationException, IOException, SAXException {
+        boardInfo = new BoardDto();
+        boardPartsInfo = new HashMap<>();
         try {
             builder = DocumentBuilderFactory.newInstance().newDocumentBuilder();
         } catch (Exception e) {
             System.out.println("Document Builder failed");
-            return null;
+            return false;
         }
         // Set the custom EntityResolver
         builder.setEntityResolver(new CustomEntityResolver());
@@ -43,20 +45,38 @@ public class BoardParser {
             doc = builder.parse(board);
         } catch (Exception e) {
             System.out.println("Parse failed with error " + e);
-            return null;
+            return false;
         }
         doc.getDocumentElement().normalize();
+        // board width and height retrieval
+        NodeList dimensionList = doc.getElementsByTagName("wire");
+        for (int i = 0; i < dimensionList.getLength(); i++) {
+            Element wireElement = (Element) dimensionList.item(i);
+            if (Integer.parseInt(wireElement.getAttribute("layer")) == 20) {
+                if (Float.parseFloat(wireElement.getAttribute("x1")) > boardInfo.getWidth()) {
+                    boardInfo.setWidth(Float.parseFloat(wireElement.getAttribute("x1")));
+                }
+                if (Float.parseFloat(wireElement.getAttribute("x2")) > boardInfo.getWidth()) {
+                    boardInfo.setWidth(Float.parseFloat(wireElement.getAttribute("x1")));
+                }
+                if (Float.parseFloat(wireElement.getAttribute("y1")) > boardInfo.getHeight()) {
+                    boardInfo.setHeight(Float.parseFloat(wireElement.getAttribute("y1")));
+                }
+                if (Float.parseFloat(wireElement.getAttribute("y2")) > boardInfo.getHeight()) {
+                    boardInfo.setHeight(Float.parseFloat(wireElement.getAttribute("y1")));
+                }
+            }
+        }
 
         // element retrieval
         NodeList elementList = doc.getElementsByTagName("element");
         for (int i = 0; i < elementList.getLength(); i++) {
-            BoardDto currentBoardPart = new BoardDto();
+            BoardPartDto currentBoardPart = new BoardPartDto();
             String currentPartName = "";
-            Node elementNode = elementList.item(i);
-            Element element = (Element) elementNode;
+            Element element = (Element) elementList.item(i);
             currentPartName = element.getAttribute("name");
             currentBoardPart.x = Float.parseFloat(element.getAttribute("x"));
-            currentBoardPart.y = Float.parseFloat(element.getAttribute("y"));
+            currentBoardPart.z = Float.parseFloat(element.getAttribute("y"));
             currentBoardPart.device_package = element.getAttribute("package");
             NodeList partAttributesList = element.getElementsByTagName("attribute");
             for (int k = 0; k < partAttributesList.getLength(); k++) {
@@ -64,12 +84,20 @@ public class BoardParser {
                 if (attributeElement.getAttribute("name").equals("MPN")) {
                     currentBoardPart.mpn = attributeElement.getAttribute("name");
                     if (!currentPartName.equals("")) {
-                        boardInfo.put(currentPartName, currentBoardPart);
+                        boardPartsInfo.put(currentPartName, currentBoardPart);
                     }
                 }
             }
         }
+        return true;
+    }
+
+    public BoardDto getBoardInfo() {
         return boardInfo;
+    }
+
+    public Map<String, BoardPartDto> getBoardPartsInfo() {
+        return boardPartsInfo;
     }
 
     private static class CustomEntityResolver implements EntityResolver {

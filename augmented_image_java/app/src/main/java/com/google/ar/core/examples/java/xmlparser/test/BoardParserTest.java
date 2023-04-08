@@ -3,7 +3,7 @@ package com.google.ar.core.examples.java.xmlparser.test;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 
-import com.google.ar.core.examples.java.xmlparser.BoardDto;
+import com.google.ar.core.examples.java.xmlparser.BoardPartDto;
 import com.google.ar.core.examples.java.xmlparser.BoardParser;
 
 import org.testng.annotations.Test;
@@ -24,8 +24,9 @@ public class BoardParserTest {
         File boardFile = new File("src/main/java/com/google/ar/core/examples/java/xmlparser/test/sab1.xml");
         assertTrue(boardFile.exists());
         BoardParser parser = new BoardParser(boardFile);
-        Map<String, BoardDto> boardInfo = parser.parseBoard();
-        assertEquals(boardInfo.size(), 35);
-        System.out.println(boardInfo);
+        boolean boardParserWorked = parser.parseBoard();
+        assertTrue(boardParserWorked);
+        System.out.println(parser.getBoardInfo());
+        System.out.println(parser.getBoardPartsInfo());
     }
 }

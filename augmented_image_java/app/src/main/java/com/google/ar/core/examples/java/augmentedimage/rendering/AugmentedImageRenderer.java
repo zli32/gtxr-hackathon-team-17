@@ -21,6 +21,9 @@ import com.google.ar.core.AugmentedImage;
 import com.google.ar.core.Pose;
 import com.google.ar.core.examples.java.common.rendering.ObjectRenderer;
 import com.google.ar.core.examples.java.common.rendering.ObjectRenderer.BlendMode;
+import com.google.ar.core.examples.java.xmlparser.BoardDto;
+import com.google.ar.core.examples.java.xmlparser.BoardPartDto;
+
 import java.io.IOException;
 
 /** Renders an augmented image. */
@@ -65,57 +68,32 @@ public class AugmentedImageRenderer {
   }
 
   public void draw(
-      float[] viewMatrix,
-      float[] projectionMatrix,
-      AugmentedImage augmentedImage,
-      Anchor centerAnchor,
-      float[] colorCorrectionRgba) {
+          float[] viewMatrix,
+          float[] projectionMatrix,
+          AugmentedImage augmentedImage,
+          Anchor centerAnchor,
+          float[] colorCorrectionRgba, BoardDto boardInfo, BoardPartDto boardPartInfo) {
     float[] tintColor =
         convertHexToColor(TINT_COLORS_HEX[augmentedImage.getIndex() % TINT_COLORS_HEX.length]);
 
-    Pose[] localBoundaryPoses = {
-      Pose.makeTranslation(
-          -0.5f * augmentedImage.getExtentX(),
-          0.0f,
-          -0.5f * augmentedImage.getExtentZ()), // upper left
-      Pose.makeTranslation(
-          0.5f * augmentedImage.getExtentX(),
-          0.0f,
-          -0.5f * augmentedImage.getExtentZ()), // upper right
-      Pose.makeTranslation(
-          0.5f * augmentedImage.getExtentX(),
-          0.0f,
-          0.5f * augmentedImage.getExtentZ()), // lower right
-      Pose.makeTranslation(
-          -0.5f * augmentedImage.getExtentX(),
-          0.0f,
-          0.5f * augmentedImage.getExtentZ()) // lower left
-    };
+    float normalizedX = augmentedImage.getExtentX() * boardPartInfo.getX() / boardInfo.getWidth();
+    float normalizedZ = augmentedImage.getExtentZ() * boardPartInfo.getZ() / boardInfo.getHeight();
+
+    float transformedX = normalizedX + augmentedImage.getExtentX() / 2;
+    float transformedZ = -normalizedZ + augmentedImage.getExtentZ() / 2;
 
     Pose anchorPose = centerAnchor.getPose();
-    Pose[] worldBoundaryPoses = new Pose[4];
-    for (int i = 0; i < 4; ++i) {
-      worldBoundaryPoses[i] = anchorPose.compose(localBoundaryPoses[i]);
-    }
-
-    float scaleFactor = 0.5f;
+    Pose modelOffset = Pose.makeTranslation(
+            transformedX,
+            0.0f,
+            transformedZ
+    );
+    float scaleFactor = 0.25f;
     float[] modelMatrix = new float[16];
 
-    worldBoundaryPoses[0].toMatrix(modelMatrix, 0);
+    modelOffset.toMatrix(modelMatrix, 0);
     object.updateModelMatrix(modelMatrix, scaleFactor);
     object.draw(viewMatrix, projectionMatrix, colorCorrectionRgba, tintColor);
-
-//    worldBoundaryPoses[1].toMatrix(modelMatrix, 0);
-//    imageFrameUpperRight.updateModelMatrix(modelMatrix, scaleFactor);
-//    imageFrameUpperRight.draw(viewMatrix, projectionMatrix, colorCorrectionRgba, tintColor);
-//
-//    worldBoundaryPoses[2].toMatrix(modelMatrix, 0);
-//    imageFrameLowerRight.updateModelMatrix(modelMatrix, scaleFactor);
-//    imageFrameLowerRight.draw(viewMatrix, projectionMatrix, colorCorrectionRgba, tintColor);
-//
-//    worldBoundaryPoses[3].toMatrix(modelMatrix, 0);
-//    imageFrameLowerLeft.updateModelMatrix(modelMatrix, scaleFactor);
-//    imageFrameLowerLeft.draw(viewMatrix, projectionMatrix, colorCorrectionRgba, tintColor);
   }
 
   private static float[] convertHexToColor(int colorHex) {
