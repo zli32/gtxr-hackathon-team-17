@@ -141,6 +141,8 @@ public class AugmentedImageActivity extends AppCompatActivity implements GLSurfa
   // debug overlay, disable for real build
   private TextView debugOverlay;
 
+  private TextView chipInformation;
+
   // bottom right mic button
   private ImageView micButton;
 
@@ -205,6 +207,7 @@ public class AugmentedImageActivity extends AppCompatActivity implements GLSurfa
   @SuppressLint("ClickableViewAccessibility")
   private void setupSpeech() {
     debugOverlay = findViewById(R.id.debug_overlay);
+    chipInformation = findViewById(R.id.Chip_Information);
     micButton = findViewById(R.id.mic_button);
     setupSpeechRecognizer();
     micButton.setOnTouchListener((view, motionEvent) -> {
@@ -385,7 +388,6 @@ public class AugmentedImageActivity extends AppCompatActivity implements GLSurfa
       // camera framerate.
       Frame frame = session.update();
       Camera camera = frame.getCamera();
-
       // Keep the screen unlocked while tracking, but allow it to lock when tracking stops.
       trackingStateHelper.updateKeepScreenOnFlag(camera.getTrackingState());
 
@@ -480,7 +482,7 @@ public class AugmentedImageActivity extends AppCompatActivity implements GLSurfa
 
             //search using voice results to select a specific biy
             boardPartInfo = boardPartMap.get(voiceResult);
-
+            chipInformation.setText("Device Package: " + boardPartInfo.getDevice_package() + "MPN: " + boardPartInfo.getMpn());
             newChip = false; //reset flag
           }
           if (boardInfo != null && boardPartInfo != null) {
