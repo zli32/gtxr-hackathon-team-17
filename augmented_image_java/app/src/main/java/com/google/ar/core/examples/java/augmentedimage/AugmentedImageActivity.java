@@ -41,6 +41,7 @@ import android.widget.Toast;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
+import androidx.core.content.FileProvider;
 
 import com.bumptech.glide.Glide;
 import com.bumptech.glide.RequestManager;
@@ -111,7 +112,7 @@ public class AugmentedImageActivity extends AppCompatActivity implements GLSurfa
   private boolean newChip;
 
   //hardcode
-  File boardFile = new File("/Users/ansontsang/Documents/gtxr-hackathon-team-17/augmented_image_java/app/src/main/java/com/google/ar/core/examples/java/xmlparser/test/sab1.xml");
+//  File boardFile = new File("storage/emulated/0/Download/sab1.xml");
 
   //arbitrary instantiation
   private BoardDto boardInfo = null;
@@ -421,6 +422,13 @@ public class AugmentedImageActivity extends AppCompatActivity implements GLSurfa
       messageSnackbarHelper.showError(this, "Could not setup augmented image database");
     }
     session.configure(config);
+    try {
+      session.resume();
+      session.pause();
+      session.resume();
+    } catch(Exception e) {
+
+    }
   }
 
   private void drawAugmentedImages(
@@ -472,13 +480,19 @@ public class AugmentedImageActivity extends AppCompatActivity implements GLSurfa
       switch (augmentedImage.getTrackingState()) {
         case TRACKING:
           if (newChip){
-            BoardParser parser = new BoardParser(boardFile);
+//            BoardParser parser = new BoardParser(boardFile);
 
-            if (parser.parseBoard() != true) { //makes sure that the parsing worked
-              break;
-            }
-            boardInfo = parser.getBoardInfo() ;
-            boardPartMap = parser.getBoardPartsInfo(); //list of all board parts
+//            if (parser.parseBoard() != true) { //makes sure that the parsing worked
+//              break;
+//            }
+//            boardInfo = parser.getBoardInfo() ;
+//            boardPartMap = parser.getBoardPartsInfo(); //list of all board parts
+            boardInfo = new BoardDto(116.84f, 50.8f);
+            boardPartMap = new HashMap<>();
+            boardPartMap.put("U3", new BoardPartDto(76.2f, 29.21f, "FAKEMPN1", "FAKE_PACKAGE1"));
+            boardPartMap.put("J6", new BoardPartDto(62.23f, 24.13f, "FAKEMPN2", "FAKE_PACKAGE2"));
+            boardPartMap.put("R9", new BoardPartDto(64.77f, 43.18f, "FAKEMPN3", "FAKE_PACKAGE3"));
+            boardPartMap.put("R4", new BoardPartDto(89.0f, 21.4f, "FAKEMPN4", "FAKE_PACKAGE4"));
 
             //search using voice results to select a specific biy
             boardPartInfo = boardPartMap.get(voiceResult);

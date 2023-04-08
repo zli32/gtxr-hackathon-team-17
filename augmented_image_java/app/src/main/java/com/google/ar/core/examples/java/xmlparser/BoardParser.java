@@ -15,6 +15,7 @@ import java.io.File;
 import java.io.IOException;
 import java.io.StringReader;
 import java.util.HashMap;
+import java.util.Locale;
 import java.util.Map;
 
 public class BoardParser {
@@ -74,7 +75,7 @@ public class BoardParser {
             BoardPartDto currentBoardPart = new BoardPartDto();
             String currentPartName = "";
             Element element = (Element) elementList.item(i);
-            currentPartName = element.getAttribute("name");
+            currentPartName = element.getAttribute("name").toUpperCase();
             currentBoardPart.x = Float.parseFloat(element.getAttribute("x"));
             currentBoardPart.z = Float.parseFloat(element.getAttribute("y"));
             currentBoardPart.device_package = element.getAttribute("package");
