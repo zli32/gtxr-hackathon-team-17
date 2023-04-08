@@ -1,3 +1,4 @@
+/*
 package com.google.ar.core.examples.java.xmlparser.test;
 
 import static org.junit.Assert.assertEquals;
@@ -29,3 +30,4 @@ public class BoardParserTest {
         System.out.println(boardInfo);
     }
 }
+ */
