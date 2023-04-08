@@ -48,10 +48,10 @@ public class AugmentedImageRenderer {
 
   public void createOnGlThread(Context context) throws IOException {
 
-//    object.createOnGlThread(
-//        context, "models/andy.obj", "models/andy.png");
-//    object.setMaterialProperties(0.0f, 3.5f, 1.0f, 6.0f);
-//    object.setBlendMode(BlendMode.AlphaBlending);
+    object.createOnGlThread(
+        context, "models/andy.obj", "models/andy.png");
+    object.setMaterialProperties(0.0f, 3.5f, 1.0f, 6.0f);
+    object.setBlendMode(BlendMode.AlphaBlending);
 
 
     chipHighlight.createOnGlThread(
@@ -83,25 +83,28 @@ public class AugmentedImageRenderer {
           float[] colorCorrectionRgba, BoardDto boardInfo, BoardPartDto boardPartInfo) {
     float[] tintColor =
         convertHexToColor(TINT_COLORS_HEX[augmentedImage.getIndex() % TINT_COLORS_HEX.length]);
-
+    System.out.println("ExtentX: " + augmentedImage.getExtentX());
+    System.out.println("ExtentZ: " + augmentedImage.getExtentZ());
     float normalizedX = augmentedImage.getExtentX() * boardPartInfo.getX() / boardInfo.getWidth();
     float normalizedZ = augmentedImage.getExtentZ() * boardPartInfo.getZ() / boardInfo.getHeight();
-
-    float transformedX = normalizedX + augmentedImage.getExtentX() / 2;
-    float transformedZ = -normalizedZ + augmentedImage.getExtentZ() / 2;
-
+    System.out.println("normalizedX: " + normalizedX);
+    System.out.println("normalizedZ: " + normalizedZ);
+    float reorientedX = -(augmentedImage.getExtentX() / 2 - normalizedX);
+    float reorientedZ = -(normalizedZ - augmentedImage.getExtentZ() / 2);
+    System.out.println("reorientedX: " + reorientedX);
+    System.out.println("reorientedZ: " + reorientedZ);
     Pose anchorPose = centerAnchor.getPose();
     Pose modelOffset = Pose.makeTranslation(
-            transformedX,
+            reorientedX,
             0.0f,
-            transformedZ
+            reorientedZ
     );
     float scaleFactor = 0.25f;
     float[] modelMatrix = new float[16];
 
-    modelOffset.toMatrix(modelMatrix, 0);
-    object.updateModelMatrix(modelMatrix, scaleFactor);
-    object.draw(viewMatrix, projectionMatrix, colorCorrectionRgba, tintColor);
+    anchorPose.compose(modelOffset).toMatrix(modelMatrix, 0);
+    chipHighlight.updateModelMatrix(modelMatrix, scaleFactor);
+    chipHighlight.draw(viewMatrix, projectionMatrix, colorCorrectionRgba, tintColor);
   }
 
   private static float[] convertHexToColor(int colorHex) {
