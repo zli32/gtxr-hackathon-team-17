@@ -74,6 +74,7 @@ import java.util.HashMap;
 import java.util.Locale;
 import java.util.Map;
 import java.util.Objects;
+import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import javax.microedition.khronos.egl.EGLConfig;
@@ -556,9 +557,14 @@ public class AugmentedImageActivity extends AppCompatActivity implements GLSurfa
       @Override
       public void onResults(Bundle results) {
         ArrayList<String> matches = results.getStringArrayList(SpeechRecognizer.RESULTS_RECOGNITION);
+        String match = null;
         if (matches != null) {
-          String match = matches.get(0);
-          match = matchToString(match);
+          for (String m: matches) {
+            match = matchToString(m);
+            if (match != null) {
+              break;
+            }
+          }
           if (match != null) {
             // match is j1, t15
             debugOverlay.setText(match);
@@ -591,15 +597,26 @@ public class AugmentedImageActivity extends AppCompatActivity implements GLSurfa
   }
 
   private String matchToString(String match) {
-    //        return the match as J3, R7 or null if theres no match
-    System.out.println("Original match: " + match);
-    String s = match.toLowerCase();
+//        return the match as J3, R7 or null if theres no match
 
-    //        make sure matches full string
-    if (Pattern.matches("[a-z][0-9]+", s)) {
-      return s;
+    String s = match.toLowerCase();
+    System.out.println("Original match: " + match);
+    if (s.contains("you too")) {
+      return "u2";
     }
-    //        assume its "[a-z] <number as english word>"
+    Pattern youR = Pattern.compile("you ([0-9]+)");
+    Matcher youM = youR.matcher(s);
+    if (youM.find()) {
+      return "u" + youM.group(1);
+    }
+
+    Pattern r = Pattern.compile("([a-z][0-9]+)");
+    Matcher m = r.matcher(s);
+//        make sure matches full string
+    if (m.find()) {
+      return m.group(0);
+    }
+//        assume its "[a-z] <number as english word>"
     if (s.matches("^.+[-\\s].+$")) {
       String[] matches = s.split("[-\\s]");
       if (matches.length >= 2) {
