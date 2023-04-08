@@ -83,23 +83,23 @@ public class AugmentedImageRenderer {
           float[] colorCorrectionRgba, BoardDto boardInfo, BoardPartDto boardPartInfo) {
     float[] tintColor =
         convertHexToColor(TINT_COLORS_HEX[augmentedImage.getIndex() % TINT_COLORS_HEX.length]);
-    System.out.println("ExtentX: " + augmentedImage.getExtentX());
-    System.out.println("ExtentZ: " + augmentedImage.getExtentZ());
+//    System.out.println("ExtentX: " + augmentedImage.getExtentX());
+//    System.out.println("ExtentZ: " + augmentedImage.getExtentZ());
     float normalizedX = augmentedImage.getExtentX() * boardPartInfo.getX() / boardInfo.getWidth();
     float normalizedZ = augmentedImage.getExtentZ() * boardPartInfo.getZ() / boardInfo.getHeight();
-    System.out.println("normalizedX: " + normalizedX);
-    System.out.println("normalizedZ: " + normalizedZ);
+//    System.out.println("normalizedX: " + normalizedX);
+//    System.out.println("normalizedZ: " + normalizedZ);
     float reorientedX = -(augmentedImage.getExtentX() / 2 - normalizedX);
     float reorientedZ = -(normalizedZ - augmentedImage.getExtentZ() / 2);
-    System.out.println("reorientedX: " + reorientedX);
-    System.out.println("reorientedZ: " + reorientedZ);
+//    System.out.println("reorientedX: " + reorientedX);
+//    System.out.println("reorientedZ: " + reorientedZ);
     Pose anchorPose = centerAnchor.getPose();
     Pose modelOffset = Pose.makeTranslation(
             reorientedX,
             0.0f,
             reorientedZ
     );
-    float scaleFactor = 0.25f;
+    float scaleFactor = 0.005f;
     float[] modelMatrix = new float[16];
 
     anchorPose.compose(modelOffset).toMatrix(modelMatrix, 0);
