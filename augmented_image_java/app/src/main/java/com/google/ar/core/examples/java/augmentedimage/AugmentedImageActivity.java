@@ -392,8 +392,9 @@ public class AugmentedImageActivity extends AppCompatActivity implements GLSurfa
     } else {
       // This is an alternative way to initialize an AugmentedImageDatabase instance,
       // load a pre-existing augmented image database.
-      try (InputStream is = getAssets().open("sample_database.imgdb")) {
+      try (InputStream is = getAssets().open("pcb/pcb_images.imgdb")) {
         augmentedImageDatabase = AugmentedImageDatabase.deserialize(session, is);
+        Log.e(TAG, "Image database successfully loaded.");
       } catch (IOException e) {
         Log.e(TAG, "IO exception loading augmented image database.", e);
         return false;
