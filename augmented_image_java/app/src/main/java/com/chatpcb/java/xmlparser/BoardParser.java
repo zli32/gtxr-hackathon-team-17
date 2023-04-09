@@ -1,4 +1,4 @@
-package com.google.ar.core.examples.java.xmlparser;
+package com.chatpcb.java.xmlparser;
 
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.DocumentBuilder;
@@ -15,7 +15,6 @@ import java.io.File;
 import java.io.IOException;
 import java.io.StringReader;
 import java.util.HashMap;
-import java.util.Locale;
 import java.util.Map;
 
 public class BoardParser {

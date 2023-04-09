@@ -1,4 +1,4 @@
-package com.google.ar.core.examples.java.xmlparser;
+package com.chatpcb.java.xmlparser;
 
 public class BoardDto {
     float width = 0;

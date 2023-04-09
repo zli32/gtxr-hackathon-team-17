@@ -13,16 +13,16 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.google.ar.core.examples.java.augmentedimage.rendering;
+package com.chatpcb.java.augmentedimage.rendering;
 
 import android.content.Context;
 import com.google.ar.core.Anchor;
 import com.google.ar.core.AugmentedImage;
 import com.google.ar.core.Pose;
-import com.google.ar.core.examples.java.common.rendering.ObjectRenderer;
-import com.google.ar.core.examples.java.common.rendering.ObjectRenderer.BlendMode;
-import com.google.ar.core.examples.java.xmlparser.BoardDto;
-import com.google.ar.core.examples.java.xmlparser.BoardPartDto;
+import com.chatpcb.java.common.rendering.ObjectRenderer;
+import com.chatpcb.java.common.rendering.ObjectRenderer.BlendMode;
+import com.chatpcb.java.xmlparser.BoardDto;
+import com.chatpcb.java.xmlparser.BoardPartDto;
 
 import java.io.IOException;
 

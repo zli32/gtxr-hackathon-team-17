@@ -14,9 +14,8 @@
  * limitations under the License.
  */
 
-package com.google.ar.core.examples.java.augmentedimage;
+package com.chatpcb.java.augmentedimage;
 
-import android.Manifest;
 import android.annotation.SuppressLint;
 import android.content.Intent;
 import android.content.pm.PackageManager;
@@ -25,23 +24,18 @@ import android.graphics.BitmapFactory;
 import android.net.Uri;
 import android.opengl.GLES20;
 import android.opengl.GLSurfaceView;
-import android.os.Build;
 import android.os.Bundle;
 import android.speech.RecognitionListener;
 import android.speech.RecognizerIntent;
 import android.speech.SpeechRecognizer;
 import android.util.Log;
 import android.util.Pair;
-import android.view.MotionEvent;
 import android.view.View;
 import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
 
 import androidx.appcompat.app.AppCompatActivity;
-import androidx.core.app.ActivityCompat;
-import androidx.core.content.ContextCompat;
-import androidx.core.content.FileProvider;
 
 import com.bumptech.glide.Glide;
 import com.bumptech.glide.RequestManager;
@@ -53,16 +47,16 @@ import com.google.ar.core.Camera;
 import com.google.ar.core.Config;
 import com.google.ar.core.Frame;
 import com.google.ar.core.Session;
-import com.google.ar.core.examples.java.augmentedimage.rendering.AugmentedImageRenderer;
-import com.google.ar.core.examples.java.common.helpers.CameraPermissionHelper;
-import com.google.ar.core.examples.java.common.helpers.DisplayRotationHelper;
-import com.google.ar.core.examples.java.common.helpers.FullScreenHelper;
-import com.google.ar.core.examples.java.common.helpers.SnackbarHelper;
-import com.google.ar.core.examples.java.common.helpers.TrackingStateHelper;
-import com.google.ar.core.examples.java.common.rendering.BackgroundRenderer;
-import com.google.ar.core.examples.java.xmlparser.BoardDto;
-import com.google.ar.core.examples.java.xmlparser.BoardParser;
-import com.google.ar.core.examples.java.xmlparser.BoardPartDto;
+import com.chatpcb.java.augmentedimage.rendering.AugmentedImageRenderer;
+import com.chatpcb.java.common.helpers.CameraPermissionHelper;
+import com.chatpcb.java.common.helpers.DisplayRotationHelper;
+import com.chatpcb.java.common.helpers.FullScreenHelper;
+import com.chatpcb.java.common.helpers.SnackbarHelper;
+import com.chatpcb.java.common.helpers.TrackingStateHelper;
+import com.chatpcb.java.common.rendering.BackgroundRenderer;
+import com.chatpcb.java.xmlparser.BoardDto;
+import com.chatpcb.java.xmlparser.BoardParser;
+import com.chatpcb.java.xmlparser.BoardPartDto;
 import com.google.ar.core.exceptions.CameraNotAvailableException;
 import com.google.ar.core.exceptions.UnavailableApkTooOldException;
 import com.google.ar.core.exceptions.UnavailableArcoreNotInstalledException;
@@ -104,7 +98,7 @@ public class AugmentedImageActivity extends AppCompatActivity implements GLSurfa
   // Rendering. The Renderers are created here, and initialized when the GL surface is created.
   private GLSurfaceView surfaceView;
   private ImageView fitToScanView;
-  private ImageView loadingSign;
+  private View loadingSign;
   private RequestManager glideRequestManager;
 
   private boolean installRequested;

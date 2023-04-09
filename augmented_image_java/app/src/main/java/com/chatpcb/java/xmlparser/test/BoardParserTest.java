@@ -1,11 +1,11 @@
 /*
-package com.google.ar.core.examples.java.xmlparser.test;
+package com.chatpcb.java.xmlparser.test;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 
-import com.google.ar.core.examples.java.xmlparser.BoardPartDto;
-import com.google.ar.core.examples.java.xmlparser.BoardParser;
+import com.chatpcb.java.xmlparser.BoardPartDto;
+import com.chatpcb.java.xmlparser.BoardParser;
 
 import org.testng.annotations.Test;
 import org.xml.sax.SAXException;

@@ -1,10 +1,9 @@
-package com.google.ar.core.examples.java.augmentedimage;
+package com.chatpcb.java.augmentedimage;
 
-import static com.google.ar.core.examples.java.augmentedimage.AugmentedImageActivity.RecordAudioRequestCode;
+import static com.chatpcb.java.augmentedimage.AugmentedImageActivity.RecordAudioRequestCode;
 
 import android.Manifest;
 import android.annotation.SuppressLint;
-import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
 import android.content.pm.PackageManager;
@@ -12,14 +11,13 @@ import android.database.Cursor;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
-import com.google.android.material.snackbar.Snackbar;
+
 import androidx.appcompat.app.AppCompatActivity;
 
 import android.provider.OpenableColumns;
 import android.util.Log;
 import android.view.View;
 import android.widget.Button;
-import android.widget.Toast;
 
 import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
@@ -27,8 +25,8 @@ import androidx.core.content.ContextCompat;
 //import androidx.navigation.Navigation;
 //import androidx.navigation.ui.AppBarConfiguration;
 //import androidx.navigation.ui.NavigationUI;
-//import com.google.ar.core.examples.java.augmentedimage.databinding.ActivityFileSelectionBinding;
-import com.google.ar.core.examples.java.common.helpers.CameraPermissionHelper;
+//import com.chatpcb.java.augmentedimage.databinding.ActivityFileSelectionBinding;
+import com.chatpcb.java.common.helpers.CameraPermissionHelper;
 
 import java.io.File;
 import java.io.FileOutputStream;
