@@ -31,11 +31,10 @@ public class FileSelection extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        setContentView(R.layout.activity_file_selection);
         if (ContextCompat.checkSelfPermission(this, Manifest.permission.READ_EXTERNAL_STORAGE) != PackageManager.PERMISSION_GRANTED) {
             ActivityCompat.requestPermissions(this, new String[] { Manifest.permission.READ_EXTERNAL_STORAGE }, 2);
         }
-
-        setContentView(R.layout.activity_file_selection);
 
         Button chooseImageButton = findViewById(R.id.choose_image_file);
         Button chooseXMLButton = findViewById(R.id.choose_xml_file);
@@ -66,24 +65,24 @@ public class FileSelection extends AppCompatActivity {
             }
         });
     }
-    @Override
-    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
-        super.onActivityResult(requestCode, resultCode, data);
-        if (resultCode == RESULT_OK) {
-            if (requestCode == 1) {
-                Uri fileUri = data.getData();
-                String filePath = fileUri.getPath(); // get the file path from the URI
-                System.out.println(filePath);
-                imgFile = new File(fileUri.getPath());
-                System.out.println(imgFile);
-            } else if (resultCode == 2) {
-                Uri fileUri = data.getData();
-                String filePath = fileUri.getPath(); // get the file path from the URI
-                System.out.println(filePath);
-                xmlFile = new File(fileUri.getPath());
-                System.out.println(xmlFile.isFile());
-                // do something with the selected file
-            }
-        }
-    }
+//    @Override
+//    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+//        super.onActivityResult(requestCode, resultCode, data);
+//        if (resultCode == RESULT_OK) {
+//            if (requestCode == 1) {
+//                Uri fileUri = data.getData();
+//                String filePath = fileUri.getPath(); // get the file path from the URI
+//                System.out.println(filePath);
+//                imgFile = new File(fileUri.getPath());
+//                System.out.println(imgFile);
+//            } else if (resultCode == 2) {
+//                Uri fileUri = data.getData();
+//                String filePath = fileUri.getPath(); // get the file path from the URI
+//                System.out.println(filePath);
+//                xmlFile = new File(fileUri.getPath());
+//                System.out.println(xmlFile.isFile());
+//                // do something with the selected file
+//            }
+//        }
+//    }
 }
