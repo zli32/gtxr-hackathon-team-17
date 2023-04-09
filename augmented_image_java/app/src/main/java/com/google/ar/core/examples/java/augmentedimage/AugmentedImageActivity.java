@@ -111,8 +111,9 @@ public class AugmentedImageActivity extends AppCompatActivity implements GLSurfa
 
   private boolean newChip;
 
-  //hardcode
-//  File boardFile = new File("storage/emulated/0/Download/sab1.xml");
+  File boardFile = null;
+
+  File imgFile = null;
 
   //arbitrary instantiation
   private BoardDto boardInfo = null;
@@ -174,10 +175,10 @@ public class AugmentedImageActivity extends AppCompatActivity implements GLSurfa
   @Override
   protected void onCreate(Bundle savedInstanceState) {
     super.onCreate(savedInstanceState);
+    boardFile = (File) getIntent().getSerializableExtra("xmlFile");
+    imgFile = (File) getIntent().getSerializableExtra("imgFile");
     setContentView(R.layout.activity_main);
-    if(ContextCompat.checkSelfPermission(this,Manifest.permission.RECORD_AUDIO) != PackageManager.PERMISSION_GRANTED){
-      checkPermission();
-    }
+
     surfaceView = findViewById(R.id.surfaceview);
     displayRotationHelper = new DisplayRotationHelper(/*context=*/ this);
 
@@ -241,12 +242,7 @@ public class AugmentedImageActivity extends AppCompatActivity implements GLSurfa
             break;
         }
 
-        // ARCore requires camera permissions to operate. If we did not yet obtain runtime
-        // permission on Android M and above, now is a good time to ask the user for it.
-        if (!CameraPermissionHelper.hasCameraPermission(this)) {
-          CameraPermissionHelper.requestCameraPermission(this);
-          return;
-        }
+
 
         session = new Session(/* context = */ this);
       } catch (UnavailableArcoreNotInstalledException
@@ -543,12 +539,7 @@ public class AugmentedImageActivity extends AppCompatActivity implements GLSurfa
     return null;
   }
 
-  @SuppressLint("ObsoleteSdkInt")
-  private void checkPermission() {
-    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
-      ActivityCompat.requestPermissions(this,new String[]{Manifest.permission.RECORD_AUDIO},RecordAudioRequestCode);
-    }
-  }
+
 
   private void setupSpeechRecognizer() {
     // Create a new SpeechRecognizer
