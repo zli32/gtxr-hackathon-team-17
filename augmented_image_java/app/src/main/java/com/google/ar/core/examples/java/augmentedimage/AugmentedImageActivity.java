@@ -104,6 +104,7 @@ public class AugmentedImageActivity extends AppCompatActivity implements GLSurfa
   // Rendering. The Renderers are created here, and initialized when the GL surface is created.
   private GLSurfaceView surfaceView;
   private ImageView fitToScanView;
+  private ImageView loadingSign;
   private RequestManager glideRequestManager;
 
   private boolean installRequested;
@@ -202,6 +203,7 @@ public class AugmentedImageActivity extends AppCompatActivity implements GLSurfa
     surfaceView.setWillNotDraw(false);
 
     fitToScanView = findViewById(R.id.image_view_fit_to_scan);
+    loadingSign = findViewById(R.id.progressBar);
     glideRequestManager = Glide.with(this);
     glideRequestManager
         .load(Uri.parse("file:///android_asset/fit_to_scan.png"))
@@ -433,8 +435,6 @@ public class AugmentedImageActivity extends AppCompatActivity implements GLSurfa
           // String text = String.format("Detected Image %d", augmentedImage.getIndex());
           //messageSnackbarHelper.showMessage(this, text);
           //messageSnackbarHelper.showMessageForShortDuration(this, text);
-          View loadingSign = findViewById(R.id.progressBar);
-          loadingSign.setVisibility(View.GONE);
           break;
 
         case TRACKING:
@@ -444,6 +444,7 @@ public class AugmentedImageActivity extends AppCompatActivity implements GLSurfa
                 @Override
                 public void run() {
                   fitToScanView.setVisibility(View.GONE);
+                  loadingSign.setVisibility(View.GONE);
                 }
               });
 

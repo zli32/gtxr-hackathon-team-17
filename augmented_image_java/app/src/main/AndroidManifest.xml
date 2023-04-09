@@ -42,7 +42,6 @@
             android:name=".AugmentedImageActivity"
             android:configChanges="orientation|screenSize"
             android:exported="true"
-            android:screenOrientation="locked"
             android:theme="@style/Theme.AppCompat.NoActionBar" >
 
         </activity> <!-- Indicates whether "Google Play Services for AR" (ARCore) is "required" or "optional". -->
