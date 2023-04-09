@@ -424,7 +424,8 @@ public class AugmentedImageActivity extends AppCompatActivity implements GLSurfa
           // When an image is in PAUSED state, but the camera is not PAUSED, it has been detected,
           // but not yet tracked.
           String text = String.format("Detected Image %d", augmentedImage.getIndex());
-          messageSnackbarHelper.showMessage(this, text);
+          //messageSnackbarHelper.showMessage(this, text);
+          messageSnackbarHelper.showMessageForShortDuration(this, text);
           break;
 
         case TRACKING:
@@ -478,7 +479,11 @@ public class AugmentedImageActivity extends AppCompatActivity implements GLSurfa
 
             //search using voice results to select a specific biy
             boardPartInfo = boardPartMap.get(voiceResult);
-            chipInformation.setText("Device Package: " + boardPartInfo.getDevice_package() + "\nMPN: " + boardPartInfo.getMpn());
+
+            if (boardPartInfo.getDevice_package() != null && boardPartInfo.getMpn() != null) {
+              chipInformation.setText("Device Package: " + boardPartInfo.getDevice_package() + "\n MPN: " + boardPartInfo.getMpn());
+            }
+
             newChip = false; //reset flag
           }
           if (boardInfo != null && boardPartInfo != null) {
@@ -599,7 +604,7 @@ public class AugmentedImageActivity extends AppCompatActivity implements GLSurfa
             // match is j1, t15
             voiceResult = match.toUpperCase();
             newChip = true;
-            debugOverlay.setText(match);
+            debugOverlay.setText(voiceResult);
             System.out.println(match);
           } else {
             debugOverlay.setText("No match");
@@ -651,7 +656,12 @@ public class AugmentedImageActivity extends AppCompatActivity implements GLSurfa
     if (s.matches("^.+[-\\s].+$")) {
       String[] matches = s.split("[-\\s]");
       if (matches.length >= 2) {
-        String letter = matches[0].substring(0, 1);
+        String letter = matches[0];
+        if (letter.equals("you")) {
+          letter = "u";
+        } else {
+          letter = letter.substring(0, 1);
+        }
         String number = matches[1];
         if (numbers.containsKey(number)) {
           return letter + (Objects.requireNonNull(numbers.get(number))).toString();
