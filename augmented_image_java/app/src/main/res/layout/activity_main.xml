@@ -30,8 +30,7 @@
       android:layout_width="match_parent"
       android:layout_height="match_parent"
       android:layout_gravity="center"
-      android:scaleType="fitCenter"
-      />
+      android:scaleType="fitCenter" />
 
   <TextView
       android:id="@+id/debug_overlay"
@@ -54,6 +53,13 @@
       android:text="Chip Information"
       android:textColor="#FFFFFF"
       android:textSize="24sp" />
+
+  <ProgressBar
+      android:id="@+id/progressBar"
+      style="?android:attr/progressBarStyle"
+      android:layout_width="67dp"
+      android:layout_height="64dp"
+      android:layout_gravity="end" />
 
 
 </FrameLayout>
