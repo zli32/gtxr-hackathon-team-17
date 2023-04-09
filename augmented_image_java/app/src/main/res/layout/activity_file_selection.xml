@@ -10,54 +10,64 @@
     <Button
         android:id="@+id/choose_image_file"
         android:layout_width="222dp"
-        android:layout_height="49dp"
+        android:layout_height="0dp"
+        android:layout_marginBottom="52dp"
         android:background="@drawable/round_button"
         android:backgroundTint="#36706E68"
         android:fontFamily="sans-serif-light"
         android:text="@string/choose_image_file"
         android:textAppearance="@style/TextAppearance.AppCompat.Display3"
         android:textSize="20sp"
+        app:layout_constraintBottom_toTopOf="@+id/choose_xml_file"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.497"
+        app:layout_constraintHorizontal_bias="0.5"
         app:layout_constraintStart_toStartOf="parent"
-        tools:layout_editor_absoluteY="263dp" />
+        app:layout_constraintTop_toBottomOf="@+id/imageView" />
 
     <Button
         android:id="@+id/choose_xml_file"
         android:layout_width="227dp"
-        android:layout_height="49dp"
+        android:layout_height="0dp"
+        android:layout_marginBottom="201dp"
         android:background="@drawable/round_button"
         android:backgroundTint="#36706E68"
+        android:fontFamily="sans-serif-light"
         android:text="@string/choose_xml_file"
         android:textSize="20sp"
-        android:fontFamily="sans-serif-light"
+        app:layout_constraintBottom_toTopOf="@+id/continue_to_ar"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="0.5"
         app:layout_constraintStart_toStartOf="parent"
-        tools:layout_editor_absoluteY="364dp" />
+        app:layout_constraintTop_toBottomOf="@+id/choose_image_file" />
 
     <Button
         android:id="@+id/continue_to_ar"
         android:layout_width="150dp"
-        android:layout_height="30dp"
-        android:backgroundTint="#FFC107"
+        android:layout_height="0dp"
+        android:layout_marginBottom="187dp"
         android:background="@drawable/round_button"
+        android:backgroundTint="#FFC107"
+        android:fontFamily="sans-serif-light"
         android:text="@string/continue_to_ar"
         android:textSize="20sp"
-        android:fontFamily="sans-serif-light"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        tools:layout_editor_absoluteY="614dp" />
-
-    <ImageView
-        android:id="@+id/imageView"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
+        app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="0.5"
         app:layout_constraintStart_toStartOf="parent"
-        app:srcCompat="@drawable/chatpcb"
-        tools:layout_editor_absoluteY="-224dp" />
+        app:layout_constraintTop_toBottomOf="@+id/choose_xml_file" />
+
+    <ImageView
+        android:id="@+id/imageView"
+        android:layout_width="338dp"
+        android:layout_height="173dp"
+        android:layout_marginTop="4dp"
+        android:layout_marginBottom="52dp"
+        app:layout_constraintBottom_toTopOf="@+id/choose_image_file"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.5"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:srcCompat="@drawable/chatpcb" />
 
 
 </androidx.constraintlayout.widget.ConstraintLayout>
