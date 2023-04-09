@@ -83,7 +83,7 @@ public class BoardParser {
             for (int k = 0; k < partAttributesList.getLength(); k++) {
                 Element attributeElement = (Element) partAttributesList.item(k);
                 if (attributeElement.getAttribute("name").equals("MPN")) {
-                    currentBoardPart.mpn = attributeElement.getAttribute("name");
+                    currentBoardPart.mpn = attributeElement.getAttribute("value");
                     if (!currentPartName.equals("")) {
                         boardPartsInfo.put(currentPartName, currentBoardPart);
                     }
