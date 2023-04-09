@@ -434,7 +434,7 @@ public class AugmentedImageActivity extends AppCompatActivity implements GLSurfa
           //messageSnackbarHelper.showMessage(this, text);
           //messageSnackbarHelper.showMessageForShortDuration(this, text);
           View loadingSign = findViewById(R.id.progressBar);
-          loadingSign.setVisibility(View.GONE);
+          runOnUiThread(() -> loadingSign.setVisibility(View.GONE));
           break;
 
         case TRACKING:
