@@ -111,8 +111,9 @@ public class AugmentedImageActivity extends AppCompatActivity implements GLSurfa
 
   private boolean newChip;
 
-  //hardcode
-//  File boardFile = new File("storage/emulated/0/Download/sab1.xml");
+  File boardFile = null;
+
+  File imgFile = null;
 
   //arbitrary instantiation
   private BoardDto boardInfo = null;
@@ -134,6 +135,8 @@ public class AugmentedImageActivity extends AppCompatActivity implements GLSurfa
   // Augmented image configuration and rendering.
   // Load a single image (true) or a pre-generated image database (false).
   private final boolean useSingleImage = false;
+
+  private BoardParser parser;
   // Augmented image and its associated center pose anchor, keyed by index of the augmented image in
   // the
   // database.
@@ -174,9 +177,17 @@ public class AugmentedImageActivity extends AppCompatActivity implements GLSurfa
   @Override
   protected void onCreate(Bundle savedInstanceState) {
     super.onCreate(savedInstanceState);
+    boardFile = (File) getIntent().getSerializableExtra("xmlFile");
+    imgFile = (File) getIntent().getSerializableExtra("imgFile");
     setContentView(R.layout.activity_main);
-    if(ContextCompat.checkSelfPermission(this,Manifest.permission.RECORD_AUDIO) != PackageManager.PERMISSION_GRANTED){
-      checkPermission();
+    parser = new BoardParser(boardFile);
+
+    try {
+      if (!parser.parseBoard()) { //makes sure that the parsing worked
+        System.out.println("Failed to parse");
+      }
+    } catch (Exception e) {
+      e.printStackTrace();
     }
     surfaceView = findViewById(R.id.surfaceview);
     displayRotationHelper = new DisplayRotationHelper(/*context=*/ this);
@@ -241,12 +252,7 @@ public class AugmentedImageActivity extends AppCompatActivity implements GLSurfa
             break;
         }
 
-        // ARCore requires camera permissions to operate. If we did not yet obtain runtime
-        // permission on Android M and above, now is a good time to ask the user for it.
-        if (!CameraPermissionHelper.hasCameraPermission(this)) {
-          CameraPermissionHelper.requestCameraPermission(this);
-          return;
-        }
+
 
         session = new Session(/* context = */ this);
       } catch (UnavailableArcoreNotInstalledException
@@ -463,24 +469,20 @@ public class AugmentedImageActivity extends AppCompatActivity implements GLSurfa
       switch (augmentedImage.getTrackingState()) {
         case TRACKING:
           if (newChip){
-//            BoardParser parser = new BoardParser(boardFile);
 
-//            if (parser.parseBoard() != true) { //makes sure that the parsing worked
-//              break;
-//            }
-//            boardInfo = parser.getBoardInfo() ;
-//            boardPartMap = parser.getBoardPartsInfo(); //list of all board parts
-            boardInfo = new BoardDto(116.84f, 50.8f);
-            boardPartMap = new HashMap<>();
-            boardPartMap.put("U3", new BoardPartDto(76.2f, 29.21f, "FAKEMPN1", "FAKE_PACKAGE1"));
-            boardPartMap.put("J6", new BoardPartDto(62.23f, 24.13f, "FAKEMPN2", "FAKE_PACKAGE2"));
-            boardPartMap.put("R9", new BoardPartDto(64.77f, 43.18f, "FAKEMPN3", "FAKE_PACKAGE3"));
-            boardPartMap.put("R4", new BoardPartDto(89.0f, 21.4f, "FAKEMPN4", "FAKE_PACKAGE4"));
+            boardInfo = parser.getBoardInfo() ;
+            boardPartMap = parser.getBoardPartsInfo(); //list of all board parts
+//            boardInfo = new BoardDto(116.84f, 50.8f);
+//            boardPartMap = new HashMap<>();
+//            boardPartMap.put("U3", new BoardPartDto(76.2f, 29.21f, "FAKEMPN1", "FAKE_PACKAGE1"));
+//            boardPartMap.put("J6", new BoardPartDto(62.23f, 24.13f, "FAKEMPN2", "FAKE_PACKAGE2"));
+//            boardPartMap.put("R9", new BoardPartDto(64.77f, 43.18f, "FAKEMPN3", "FAKE_PACKAGE3"));
+//            boardPartMap.put("R4", new BoardPartDto(89.0f, 21.4f, "FAKEMPN4", "FAKE_PACKAGE4"));
 
             //search using voice results to select a specific biy
             boardPartInfo = boardPartMap.get(voiceResult);
 
-            if (boardPartInfo.getDevice_package() != null && boardPartInfo.getMpn() != null) {
+            if (boardPartInfo != null && boardPartInfo.getDevice_package() != null && boardPartInfo.getMpn() != null) {
               chipInformation.setText("Device Package: " + boardPartInfo.getDevice_package() + "\n MPN: " + boardPartInfo.getMpn());
             }
 
@@ -543,12 +545,7 @@ public class AugmentedImageActivity extends AppCompatActivity implements GLSurfa
     return null;
   }
 
-  @SuppressLint("ObsoleteSdkInt")
-  private void checkPermission() {
-    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
-      ActivityCompat.requestPermissions(this,new String[]{Manifest.permission.RECORD_AUDIO},RecordAudioRequestCode);
-    }
-  }
+
 
   private void setupSpeechRecognizer() {
     // Create a new SpeechRecognizer
