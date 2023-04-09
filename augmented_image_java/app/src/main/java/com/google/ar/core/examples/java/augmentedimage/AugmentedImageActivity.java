@@ -34,15 +34,14 @@ import android.util.Log;
 import android.util.Pair;
 import android.view.MotionEvent;
 import android.view.View;
-import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
+import androidx.core.content.FileProvider;
 
 import com.bumptech.glide.Glide;
 import com.bumptech.glide.RequestManager;
@@ -62,12 +61,17 @@ import com.google.ar.core.examples.java.common.helpers.SnackbarHelper;
 import com.google.ar.core.examples.java.common.helpers.TrackingStateHelper;
 import com.google.ar.core.examples.java.common.rendering.BackgroundRenderer;
 import com.google.ar.core.examples.java.xmlparser.BoardDto;
+import com.google.ar.core.examples.java.xmlparser.BoardParser;
 import com.google.ar.core.examples.java.xmlparser.BoardPartDto;
 import com.google.ar.core.exceptions.CameraNotAvailableException;
 import com.google.ar.core.exceptions.UnavailableApkTooOldException;
 import com.google.ar.core.exceptions.UnavailableArcoreNotInstalledException;
 import com.google.ar.core.exceptions.UnavailableSdkTooOldException;
 import com.google.ar.core.exceptions.UnavailableUserDeclinedInstallationException;
+
+import org.xml.sax.SAXException;
+
+import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.ArrayList;
@@ -81,6 +85,7 @@ import java.util.regex.Pattern;
 
 import javax.microedition.khronos.egl.EGLConfig;
 import javax.microedition.khronos.opengles.GL10;
+import javax.xml.parsers.ParserConfigurationException;
 
 /**
  * This app extends the HelloAR Java app to include image tracking functionality.
@@ -101,6 +106,20 @@ public class AugmentedImageActivity extends AppCompatActivity implements GLSurfa
   private RequestManager glideRequestManager;
 
   private boolean installRequested;
+
+  private String voiceResult;
+
+  private boolean newChip;
+
+  //hardcode
+//  File boardFile = new File("storage/emulated/0/Download/sab1.xml");
+
+  //arbitrary instantiation
+  private BoardDto boardInfo = null;
+
+  private Map<String, BoardPartDto> boardPartMap = null;
+
+  private BoardPartDto boardPartInfo = null;
 
   private Session session;
   private final SnackbarHelper messageSnackbarHelper = new SnackbarHelper();
@@ -123,12 +142,10 @@ public class AugmentedImageActivity extends AppCompatActivity implements GLSurfa
   // debug overlay, disable for real build
   private TextView debugOverlay;
 
-  // bottom right mic button
-  private ImageView micButton;
+  private TextView chipInformation;
 
   public static final Integer RecordAudioRequestCode = 1;
   private SpeechRecognizer speechRecognizer;
-  private boolean isListening = false;
   static HashMap<String, Integer> numbers= new HashMap<String, Integer>();
 
   static {
@@ -187,22 +204,9 @@ public class AugmentedImageActivity extends AppCompatActivity implements GLSurfa
   @SuppressLint("ClickableViewAccessibility")
   private void setupSpeech() {
     debugOverlay = findViewById(R.id.debug_overlay);
-    micButton = findViewById(R.id.mic_button);
+    chipInformation = findViewById(R.id.Chip_Information);
     setupSpeechRecognizer();
-    micButton.setOnTouchListener((view, motionEvent) -> {
-      if (motionEvent.getAction() == MotionEvent.ACTION_DOWN){
-        if (!isListening) {
-          micButton.setImageResource(R.drawable.mic_red);
-          startSpeechRecognition();
-        } else {
-          micButton.setImageResource(R.drawable.mic);
-          stopSpeechRecognition();
-        }
-
-      }
-      return false;
-    });
-
+    startSpeechRecognition();
   }
 
   @Override
@@ -367,7 +371,6 @@ public class AugmentedImageActivity extends AppCompatActivity implements GLSurfa
       // camera framerate.
       Frame frame = session.update();
       Camera camera = frame.getCamera();
-
       // Keep the screen unlocked while tracking, but allow it to lock when tracking stops.
       trackingStateHelper.updateKeepScreenOnFlag(camera.getTrackingState());
 
@@ -411,18 +414,18 @@ public class AugmentedImageActivity extends AppCompatActivity implements GLSurfa
   }
 
   private void drawAugmentedImages(
-      Frame frame, float[] projmtx, float[] viewmtx, float[] colorCorrectionRgba) {
+      Frame frame, float[] projmtx, float[] viewmtx, float[] colorCorrectionRgba) throws ParserConfigurationException, IOException, SAXException {
     Collection<AugmentedImage> updatedAugmentedImages =
         frame.getUpdatedTrackables(AugmentedImage.class);
-
-    // Iterate to update augmentedImageMap, remove elements we cannot draw.
+    // Iterate to update augmentedImageMap, remove elements swe cannot draw.
     for (AugmentedImage augmentedImage : updatedAugmentedImages) {
       switch (augmentedImage.getTrackingState()) {
         case PAUSED:
           // When an image is in PAUSED state, but the camera is not PAUSED, it has been detected,
           // but not yet tracked.
           String text = String.format("Detected Image %d", augmentedImage.getIndex());
-          messageSnackbarHelper.showMessage(this, text);
+          //messageSnackbarHelper.showMessage(this, text);
+          messageSnackbarHelper.showMessageForShortDuration(this, text);
           break;
 
         case TRACKING:
@@ -452,16 +455,41 @@ public class AugmentedImageActivity extends AppCompatActivity implements GLSurfa
       }
     }
 
-    BoardDto boardInfo = new BoardDto(116.84f, 50.8f);
-    BoardPartDto boardPartDto = new BoardPartDto(20.0f, 41.0f, "FAKEMPN", "FAKE_PACKAGE");
+
     // Draw all images in augmentedImageMap
     for (Pair<AugmentedImage, Anchor> pair : augmentedImageMap.values()) {
       AugmentedImage augmentedImage = pair.first;
       Anchor centerAnchor = augmentedImageMap.get(augmentedImage.getIndex()).second;
       switch (augmentedImage.getTrackingState()) {
         case TRACKING:
-          augmentedImageRenderer.draw(
-              viewmtx, projmtx, augmentedImage, centerAnchor, colorCorrectionRgba, boardInfo, boardPartDto);
+          if (newChip){
+//            BoardParser parser = new BoardParser(boardFile);
+
+//            if (parser.parseBoard() != true) { //makes sure that the parsing worked
+//              break;
+//            }
+//            boardInfo = parser.getBoardInfo() ;
+//            boardPartMap = parser.getBoardPartsInfo(); //list of all board parts
+            boardInfo = new BoardDto(116.84f, 50.8f);
+            boardPartMap = new HashMap<>();
+            boardPartMap.put("U3", new BoardPartDto(76.2f, 29.21f, "FAKEMPN1", "FAKE_PACKAGE1"));
+            boardPartMap.put("J6", new BoardPartDto(62.23f, 24.13f, "FAKEMPN2", "FAKE_PACKAGE2"));
+            boardPartMap.put("R9", new BoardPartDto(64.77f, 43.18f, "FAKEMPN3", "FAKE_PACKAGE3"));
+            boardPartMap.put("R4", new BoardPartDto(89.0f, 21.4f, "FAKEMPN4", "FAKE_PACKAGE4"));
+
+            //search using voice results to select a specific biy
+            boardPartInfo = boardPartMap.get(voiceResult);
+
+            if (boardPartInfo.getDevice_package() != null && boardPartInfo.getMpn() != null) {
+              chipInformation.setText("Device Package: " + boardPartInfo.getDevice_package() + "\n MPN: " + boardPartInfo.getMpn());
+            }
+
+            newChip = false; //reset flag
+          }
+          if (boardInfo != null && boardPartInfo != null) {
+            augmentedImageRenderer.draw(
+                    viewmtx, projmtx, augmentedImage, centerAnchor, colorCorrectionRgba, boardInfo, boardPartInfo);
+          }
           break;
         default:
           break;
@@ -558,11 +586,7 @@ public class AugmentedImageActivity extends AppCompatActivity implements GLSurfa
       public void onError(int i) {
         // An error has occurred during recognition
         // Restart the recognition process
-        if (isListening) {
-          System.out.println("ERROR: " + i);
           speechRecognizer.startListening(createSpeechRecognizerIntent());
-        }
-
       }
 
       @Override
@@ -578,7 +602,9 @@ public class AugmentedImageActivity extends AppCompatActivity implements GLSurfa
           }
           if (match != null) {
             // match is j1, t15
-            debugOverlay.setText(match);
+            voiceResult = match.toUpperCase();
+            newChip = true;
+            debugOverlay.setText(voiceResult);
             System.out.println(match);
           } else {
             debugOverlay.setText("No match");
@@ -589,9 +615,8 @@ public class AugmentedImageActivity extends AppCompatActivity implements GLSurfa
         }
 
         // Restart the recognition process
-        if (isListening) {
-          speechRecognizer.startListening(createSpeechRecognizerIntent());
-        }
+        speechRecognizer.startListening(createSpeechRecognizerIntent());
+
 
       }
 
@@ -631,7 +656,12 @@ public class AugmentedImageActivity extends AppCompatActivity implements GLSurfa
     if (s.matches("^.+[-\\s].+$")) {
       String[] matches = s.split("[-\\s]");
       if (matches.length >= 2) {
-        String letter = matches[0].substring(0, 1);
+        String letter = matches[0];
+        if (letter.equals("you")) {
+          letter = "u";
+        } else {
+          letter = letter.substring(0, 1);
+        }
         String number = matches[1];
         if (numbers.containsKey(number)) {
           return letter + (Objects.requireNonNull(numbers.get(number))).toString();
@@ -650,20 +680,17 @@ public class AugmentedImageActivity extends AppCompatActivity implements GLSurfa
     // Specify the language model and offline mode
     intent.putExtra(RecognizerIntent.EXTRA_LANGUAGE_MODEL,RecognizerIntent.LANGUAGE_MODEL_FREE_FORM);
     intent.putExtra(RecognizerIntent.EXTRA_LANGUAGE, Locale.getDefault());
-//    intent.putExtra(RecognizerIntent.EXTRA_PREFER_OFFLINE, true);
     return intent;
   }
 
   private void startSpeechRecognition() {
     // Start the recognition process
     speechRecognizer.startListening(createSpeechRecognizerIntent());
-    isListening = true;
   }
 
   private void stopSpeechRecognition() {
     // Stop the recognition process
     speechRecognizer.stopListening();
-    isListening = false;
     debugOverlay.setHint("Stopped Listening");
     System.out.println("Stopped.");
   }
