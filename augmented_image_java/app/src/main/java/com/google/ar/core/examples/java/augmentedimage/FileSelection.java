@@ -44,6 +44,7 @@ public class FileSelection extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        setContentView(R.layout.activity_file_selection);
         if (ContextCompat.checkSelfPermission(this, Manifest.permission.READ_EXTERNAL_STORAGE) != PackageManager.PERMISSION_GRANTED) {
             ActivityCompat.requestPermissions(this, new String[] { Manifest.permission.READ_EXTERNAL_STORAGE }, 2);
         }
@@ -56,8 +57,6 @@ public class FileSelection extends AppCompatActivity {
         if (!CameraPermissionHelper.hasCameraPermission(this)) {
             CameraPermissionHelper.requestCameraPermission(this);
         }
-
-        setContentView(R.layout.activity_file_selection);
 
         Button chooseImageButton = findViewById(R.id.choose_image_file);
         Button chooseXMLButton = findViewById(R.id.choose_xml_file);

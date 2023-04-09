@@ -11,32 +11,34 @@
         android:id="@+id/choose_image_file"
         android:layout_width="231dp"
         android:layout_height="wrap_content"
-        android:layout_marginTop="60dp"
-        android:text="Choose Image File"
+        android:backgroundTint="#FFC107"
+        android:text="@string/choose_image_file"
         app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.5"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent" />
+        tools:layout_editor_absoluteY="293dp" />
 
     <Button
         android:id="@+id/choose_xml_file"
-        android:layout_width="226dp"
+        android:layout_width="227dp"
         android:layout_height="wrap_content"
-        android:layout_marginTop="28dp"
-        android:text="Choose XML File"
+        android:backgroundTint="#FFC107"
+        android:text="@string/choose_xml_file"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.497"
+        app:layout_constraintHorizontal_bias="0.5"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/choose_image_file" />
+        tools:layout_editor_absoluteY="364dp" />
 
     <Button
         android:id="@+id/continue_to_ar"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginBottom="108dp"
-        android:text="Continue to AR"
-        app:layout_constraintBottom_toBottomOf="parent"
+        android:backgroundTint="#FFC107"
+        android:text="@string/continue_to_ar"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent" />
+        app:layout_constraintHorizontal_bias="0.5"
+        app:layout_constraintStart_toStartOf="parent"
+        tools:layout_editor_absoluteY="675dp" />
 
 
 </androidx.constraintlayout.widget.ConstraintLayout>
