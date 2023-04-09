@@ -55,7 +55,6 @@ public class FileSelection extends AppCompatActivity {
         // permission on Android M and above, now is a good time to ask the user for it.
         if (!CameraPermissionHelper.hasCameraPermission(this)) {
             CameraPermissionHelper.requestCameraPermission(this);
-            return;
         }
 
         setContentView(R.layout.activity_file_selection);
