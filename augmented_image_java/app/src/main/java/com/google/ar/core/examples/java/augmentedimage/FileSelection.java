@@ -8,25 +8,33 @@ import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
 import android.content.pm.PackageManager;
+import android.database.Cursor;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
 import com.google.android.material.snackbar.Snackbar;
 import androidx.appcompat.app.AppCompatActivity;
+
+import android.provider.OpenableColumns;
+import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.Toast;
 
 import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
-import androidx.navigation.NavController;
-import androidx.navigation.Navigation;
-import androidx.navigation.ui.AppBarConfiguration;
-import androidx.navigation.ui.NavigationUI;
-import com.google.ar.core.examples.java.augmentedimage.databinding.ActivityFileSelectionBinding;
+//import androidx.navigation.NavController;
+//import androidx.navigation.Navigation;
+//import androidx.navigation.ui.AppBarConfiguration;
+//import androidx.navigation.ui.NavigationUI;
+//import com.google.ar.core.examples.java.augmentedimage.databinding.ActivityFileSelectionBinding;
 import com.google.ar.core.examples.java.common.helpers.CameraPermissionHelper;
 
 import java.io.File;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.OutputStream;
 
 public class FileSelection extends AppCompatActivity {
     private static final String TAG = "ChooseFileActivity";
@@ -96,18 +104,60 @@ public class FileSelection extends AppCompatActivity {
         if (resultCode == RESULT_OK) {
             if (requestCode == 1) {
                 Uri fileUri = data.getData();
-                String filePath = fileUri.getPath(); // get the file path from the URI
-                System.out.println(filePath);
-                imgFile = new File(fileUri.getPath());
-                System.out.println(imgFile);
+                try {
+                    imgFile = getFile(this, fileUri);
+                } catch (IOException e) {
+                    throw new RuntimeException(e);
+                }
+                System.out.println(imgFile.getPath());
+                System.out.println(imgFile.isFile());
             } else if (requestCode == 2) {
                 Uri fileUri = data.getData();
-                String filePath = fileUri.getPath(); // get the file path from the URI
-                System.out.println(filePath);
-                xmlFile = new File(fileUri.getPath());
+                try {
+                    xmlFile = getFile(this, fileUri);
+                } catch (IOException e) {
+                    throw new RuntimeException(e);
+                }
+                System.out.println(xmlFile.getPath());
                 System.out.println(xmlFile.isFile());
                 // do something with the selected file
             }
         }
+    }
+
+    public static File getFile(Context context, Uri uri) throws IOException {
+        File destinationFilename = new File(context.getFilesDir().getPath() + File.separatorChar + queryName(context, uri));
+        try (InputStream ins = context.getContentResolver().openInputStream(uri)) {
+            createFileFromStream(ins, destinationFilename);
+        } catch (Exception ex) {
+            Log.e("Save File", ex.getMessage());
+            ex.printStackTrace();
+        }
+        return destinationFilename;
+    }
+
+    public static void createFileFromStream(InputStream ins, File destination) {
+        try (OutputStream os = new FileOutputStream(destination)) {
+            byte[] buffer = new byte[4096];
+            int length;
+            while ((length = ins.read(buffer)) > 0) {
+                os.write(buffer, 0, length);
+            }
+            os.flush();
+        } catch (Exception ex) {
+            Log.e("Save File", ex.getMessage());
+            ex.printStackTrace();
+        }
+    }
+
+    private static String queryName(Context context, Uri uri) {
+        Cursor returnCursor =
+                context.getContentResolver().query(uri, null, null, null, null);
+        assert returnCursor != null;
+        int nameIndex = returnCursor.getColumnIndex(OpenableColumns.DISPLAY_NAME);
+        returnCursor.moveToFirst();
+        String name = returnCursor.getString(nameIndex);
+        returnCursor.close();
+        return name;
     }
 }
